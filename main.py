@@ -20,45 +20,51 @@ assistant_id = functions.create_assistant(client)
 # Start conversation thread
 @app.route('/start', methods=['GET'])
 def start_conversation():
-  thread = client.beta.threads.create()
-  return jsonify({"thread_id": thread.id})
+    try:
+        thread = client.beta.threads.create()
+        return jsonify({"thread_id": thread.id})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Generate response
 @app.route('/chat', methods=['POST'])
 def chat():
-  data = request.json
-  thread_id = data.get('thread_id')
-  user_input = data.get('message', '')
+    data = request.json
+    thread_id = data.get('thread_id')
+    user_input = data.get('message', '')
 
-  if not thread_id:
-    return jsonify({"error": "Missing thread_id"}), 400
+    if not thread_id:
+        return jsonify({"error": "Missing thread_id"}), 400
 
-  client.beta.threads.messages.create(
-    thread_id=thread_id,
-    role="user",
-    content=user_input
-  )
+    try:
+        client.beta.threads.messages.create(
+            thread_id=thread_id,
+            role="user",
+            content=user_input
+        )
 
-  run = client.beta.threads.runs.create(
-    thread_id=thread_id,
-    assistant_id=assistant_id
-  )
+        run = client.beta.threads.runs.create(
+            thread_id=thread_id,
+            assistant_id=assistant_id
+        )
 
-  while True:
-    run_status = client.beta.threads.runs.retrieve(
-      thread_id=thread_id,
-      run_id=run.id
-    )
-    if run_status.status == 'completed':
-      break
-    sleep(1)
+        while True:
+            run_status = client.beta.threads.runs.retrieve(
+                thread_id=thread_id,
+                run_id=run.id
+            )
+            if run_status.status == 'completed':
+                break
+            sleep(1)
 
-  messages = client.beta.threads.messages.list(thread_id=thread_id)
-  response = messages.data[0].content[0].text.value
+        messages = client.beta.threads.messages.list(thread_id=thread_id)
+        response = messages.data[0].content[0].text.value
 
-  print(f"Assistant response: {response}")
-  return jsonify({"response": response})
+        print(f"Assistant response: {response}")
+        return jsonify({"response": response})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Run server
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080)
