@@ -13,7 +13,7 @@ def create_assistant(client):
   else:
 
     vector_store = client.beta.vector_stores.create(name="Knowledge Documents")
-    file_paths = ["knowledge/doc1.docx", "knowledge/doc2.docx", "knowledge/doc3.docx", "knowledge/doc4.docx", "knowledge/doc5.docx", "knowledge/doc6.docx", "knowledge/doc7.docx", "knowledge/doc8.docx", "knowledge/doc9.docx", "knowledge/doc10.docx", "knowledge/doc11.docx", "knowledge/doc12.docx", "knowledge/doc13.docx", "knowledge/doc14.docx", "knowledge/doc15.docx", "knowledge/doc16.docx", "knowledge/doc17.docx", "knowledge/doc18.docx", "knowledge/doc19.docx", "knowledge/doc20.docx", "knowledge/doc21.docx", "knowledge/doc22.docx", "knowledge/doc23.docx", "knowledge/doc24.docx"]
+    file_paths = ["knowledge/demodoc.docx"]
 
     file_streams = [open(path, "rb") for path in file_paths]
 
